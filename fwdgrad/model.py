@@ -30,7 +30,7 @@ class NeuralNet(nn.Module):
             setattr(self, f"act{i}", activation_function or nn.ReLU())
         self.out = nn.Linear(hidden_sizes[-1], num_classes)
 
-    def forward(self, x):
+    def forward(self, x: torch.Tensor) -> torch.Tensor:
         for i in range(len(self.hidden_sizes) - 1):
             x = getattr(self, f"act{i}")(getattr(self, f"fc{i}")(x))
         x = self.out(x)
