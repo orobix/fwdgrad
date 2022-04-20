@@ -19,8 +19,8 @@ def xent(model: torch.nn.Module, x: torch.Tensor, t: torch.Tensor, num_classes: 
 
 
 def functional_xent(
-    params: Tuple[torch.nn.Parameter],
-    model: Callable[[Tuple[torch.nn.Parameter], torch.Tensor], torch.Tensor],
+    params: Tuple[torch.nn.Parameter, ...],
+    model: Callable[[Tuple[torch.nn.Parameter, ...], torch.Tensor], torch.Tensor],
     x: torch.Tensor,
     t: torch.Tensor,
     num_classes: int = 10,
