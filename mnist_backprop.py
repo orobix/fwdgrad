@@ -2,10 +2,7 @@ import time
 
 import torch
 import torchvision
-import torch.nn as nn
-import torch.nn.functional as F
 from torch.utils.data import DataLoader
-
 
 from fwdgrad.loss import xent
 from fwdgrad.model import NeuralNet
@@ -14,6 +11,8 @@ EPOCHS = 50
 BATCH_SIZE = 32
 LR = 1e-3
 HIDDEN_SIZES = [64]
+USE_CUDA = torch.cuda.is_available()
+DEVICE = torch.device("cuda" if USE_CUDA else "cpu")
 
 
 def train_model():
@@ -25,9 +24,10 @@ def train_model():
             [torchvision.transforms.ToTensor(), torchvision.transforms.Lambda(lambda x: torch.flatten(x))]
         ),
     )
-    train_loader = DataLoader(mnist, batch_size=BATCH_SIZE, shuffle=True, num_workers=2)
+    train_loader = DataLoader(mnist, batch_size=BATCH_SIZE, shuffle=True, num_workers=2, pin_memory=True)
 
     model = NeuralNet(784, HIDDEN_SIZES)
+    model.to(DEVICE)
     model.train()
     params = tuple(model.parameters())
 
@@ -36,7 +36,7 @@ def train_model():
         t0 = time.perf_counter()
         for i, batch in enumerate(train_loader):
             images, labels = batch
-            loss = xent(model, images, labels)
+            loss = xent(model, images.to(DEVICE), labels.to(DEVICE))
             loss.backward()
             for p in params:
                 p.data.sub_(LR * p.grad.data)

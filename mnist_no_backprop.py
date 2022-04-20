@@ -13,6 +13,8 @@ EPOCHS = 50
 BATCH_SIZE = 32
 LR = 1e-3
 HIDDEN_SIZES = [64]
+USE_CUDA = torch.cuda.is_available()
+DEVICE = torch.device("cuda" if USE_CUDA else "cpu")
 
 
 def train_model():
@@ -24,10 +26,11 @@ def train_model():
             [torchvision.transforms.ToTensor(), torchvision.transforms.Lambda(lambda x: torch.flatten(x))]
         ),
     )
-    train_loader = DataLoader(mnist, batch_size=BATCH_SIZE, shuffle=True, num_workers=2)
+    train_loader = DataLoader(mnist, batch_size=BATCH_SIZE, shuffle=True, num_workers=2, pin_memory=True)
 
     with torch.no_grad():
         model = NeuralNet(784, HIDDEN_SIZES)
+        model.to(DEVICE)
         model.train()
 
         # Get the functional version of the model with functorch
@@ -42,7 +45,7 @@ def train_model():
 
                 # Sample tangent vectors for every parameters of the model
                 v_params = tuple([torch.randn_like(p) for p in params])
-                f = partial(functional_xent, model=fmodel, x=images, t=labels)
+                f = partial(functional_xent, model=fmodel, x=images.to(DEVICE), t=labels.to(DEVICE))
                 loss, jvp = fc.jvp(f, (params,), (v_params,))
                 params = tuple([p.sub_(LR * jvp * v_params[i]) for i, p in enumerate(params)])
             t1 = time.perf_counter()
