@@ -12,7 +12,8 @@ BATCH_SIZE = 32
 LR = 1e-3
 HIDDEN_SIZES = [64]
 USE_CUDA = torch.cuda.is_available()
-DEVICE = torch.device("cuda" if USE_CUDA else "cpu")
+DEVICE_ID = 2
+DEVICE = torch.device(f"cuda:{DEVICE_ID}" if USE_CUDA else "cpu")
 
 
 def train_model():
