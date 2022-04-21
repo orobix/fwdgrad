@@ -3,3 +3,5 @@ defaults:
   - dataset: default
   - model: default
   - optimization: default
+
+device_id: 0

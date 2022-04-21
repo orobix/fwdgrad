@@ -13,13 +13,10 @@ from fwdgrad.loss import functional_xent
 from fwdgrad.model import NeuralNet
 
 
-USE_CUDA = torch.cuda.is_available()
-DEVICE_ID = 2
-DEVICE = torch.device(f"cuda:{DEVICE_ID}" if USE_CUDA else "cpu")
-
-
 @hydra.main(config_path="./configs/", config_name="config.yaml")
 def train_model(cfg: DictConfig):
+    USE_CUDA = torch.cuda.is_available()
+    DEVICE = torch.device(f"cuda:{cfg.device_id}" if USE_CUDA else "cpu")
     mnist = torchvision.datasets.MNIST(
         "/tmp/data",
         train=True,
@@ -32,7 +29,11 @@ def train_model(cfg: DictConfig):
         ),
     )
     train_loader = DataLoader(
-        mnist, batch_size=cfg.dataset.batch_size, shuffle=True, num_workers=2, pin_memory=True
+        mnist,
+        batch_size=cfg.dataset.batch_size,
+        shuffle=True,
+        num_workers=2,
+        pin_memory=True,
     )
 
     input_size = mnist.data.shape[1] * mnist.data.shape[2]
@@ -61,7 +62,10 @@ def train_model(cfg: DictConfig):
                 )
                 loss, jvp = fc.jvp(f, (params,), (v_params,))
                 params = tuple(
-                    [p.sub_(cfg.optimization.learning_rate * jvp * v_params[i]) for i, p in enumerate(params)]
+                    [
+                        p.sub_(cfg.optimization.learning_rate * jvp * v_params[i])
+                        for i, p in enumerate(params)
+                    ]
                 )
             t1 = time.perf_counter()
             t_total += t1 - t0

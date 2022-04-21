@@ -10,13 +10,11 @@ from omegaconf import DictConfig
 from fwdgrad.loss import xent
 from fwdgrad.model import NeuralNet
 
-USE_CUDA = torch.cuda.is_available()
-DEVICE_ID = 2
-DEVICE = torch.device(f"cuda:{DEVICE_ID}" if USE_CUDA else "cpu")
-
 
 @hydra.main(config_path="./configs/", config_name="config.yaml")
 def train_model(cfg: DictConfig):
+    USE_CUDA = torch.cuda.is_available()
+    DEVICE = torch.device(f"cuda:{cfg.device_id}" if USE_CUDA else "cpu")
     mnist = torchvision.datasets.MNIST(
         "/tmp/data",
         train=True,
