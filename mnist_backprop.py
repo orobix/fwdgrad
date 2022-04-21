@@ -34,6 +34,7 @@ def train_model(cfg: DictConfig):
         pin_memory=True,
     )
     input_size = mnist.data.shape[1] * mnist.data.shape[2]
+    # TODO: Add model to hydra config so that we can instantiate it here with hydra.utils.instantiate
     model = NeuralNet(input_size, cfg.model.hidden_dims)
     model.to(DEVICE)
     model.train()
@@ -51,9 +52,7 @@ def train_model(cfg: DictConfig):
                 p.grad.data.zero_()
         t1 = time.perf_counter()
         t_total += t1 - t0
-        print(
-            f"Epoch [{epoch+1}/{cfg.optimization.epochs}], Loss: {loss.item():.4f}, Time (s): {t1 - t0:.4f}"
-        )
+        print(f"Epoch [{epoch+1}/{cfg.optimization.epochs}], Loss: {loss.item():.4f}, Time (s): {t1 - t0:.4f}")
     print("Mean time:", t_total / cfg.optimization.epochs)
 
 
