@@ -31,9 +31,7 @@ def train_model(cfg: DictConfig):
     input_size = mnist.data.shape[1] * mnist.data.shape[2]
     output_size = len(mnist.classes)
     with torch.no_grad():
-        model = hydra.utils.instantiate(
-            cfg.model, input_size=input_size, output_size=output_size
-        )
+        model = hydra.utils.instantiate(cfg.model, input_size=input_size, output_size=output_size)
         model.to(DEVICE)
         model.train()
 
@@ -57,16 +55,11 @@ def train_model(cfg: DictConfig):
                 )
                 loss, jvp = fc.jvp(f, (params,), (v_params,))
                 params = tuple(
-                    [
-                        p.sub_(cfg.optimization.learning_rate * jvp * v_params[i])
-                        for i, p in enumerate(params)
-                    ]
+                    [p.sub_(cfg.optimization.learning_rate * jvp * v_params[i]) for i, p in enumerate(params)]
                 )
             t1 = time.perf_counter()
             t_total += t1 - t0
-            print(
-                f"Epoch [{epoch+1}/{cfg.optimization.epochs}], Loss: {loss.item():.4f}, Time (s): {t1 - t0:.4f}"
-            )
+            print(f"Epoch [{epoch+1}/{cfg.optimization.epochs}], Loss: {loss.item():.4f}, Time (s): {t1 - t0:.4f}")
         print(f"Mean time: {t_total / cfg.optimization.epochs:.4f}")
 
 
