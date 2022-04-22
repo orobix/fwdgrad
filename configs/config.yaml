@@ -1,0 +1,7 @@
+defaults:
+  - _self_
+  - dataset: default
+  - model: default
+  - optimization: default
+
+device_id: 0

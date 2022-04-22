@@ -1,0 +1,5 @@
+torch>=1.11
+torchvision>=0.12
+functorch>=0.1
+omegaconf~=2.1.2
+hydra-core==1.1.2
