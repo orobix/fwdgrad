@@ -1,0 +1,6 @@
+_target_: fwdgrad.model.NeuralNet
+_recursive_: true
+activation_function:
+  _target_: torch.nn.ReLU
+hidden_sizes:
+    - 64
