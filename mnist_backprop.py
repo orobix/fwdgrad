@@ -2,7 +2,6 @@ import time
 
 import torch
 import torchvision
-from torch.utils.data import DataLoader
 
 import hydra
 from omegaconf import DictConfig
@@ -25,13 +24,8 @@ def train_model(cfg: DictConfig):
             ]
         ),
     )
-    train_loader = DataLoader(
-        mnist,
-        batch_size=cfg.dataset.batch_size,
-        shuffle=True,
-        num_workers=2,
-        pin_memory=True,
-    )
+
+    train_loader = hydra.utils.instantiate(cfg.dataset, dataset=mnist)
     input_size = mnist.data.shape[1] * mnist.data.shape[2]
     output_size = len(mnist.classes)
 
