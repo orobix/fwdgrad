@@ -14,15 +14,17 @@ Since the library functorch is still in it's early development, the gradient com
 ## Jvp
 The Jvp is the product of the Jacobian *J* of the model, derived with respect of the parameters, and a vector *v* called *perturbation vector* that, according to paper, is sampled from a Normal distribution with mean 0 and variance 1 at each forward pass.
 
-# Running the test
+# Running the tests
 For running the tests, simply clone the repository and, after moving to the repo root, use the command `python <name_of_the_example.py>`.
 
 For comparison, also the same examples implemented with backpropagation is provided. To let the two implementations be as similar as possible, we used the rewritten Pytorch operations also for the backpropagation example (even if, in this case, Pytorch would support those operators).
 
 ## Running more examples
-All the configurations are managed using [Hydra](https://hydra.cc).
+All the configurations are managed using [Hydra](https://hydra.cc). All configuration's file are stored in the `/configs` folder.
 
-Changing something in the MNIST example can be easily achieved by adding configuration files (found under `/configs`) in the respective subfolder. These configurations can be used to change:
+For changing the global optimization example, modify the `global_optim_config.yaml` file.
+
+Changing something in the MNIST example can be easily achieved by adding configuration files in the respective subfolder and changing the `config.yaml` file. These configurations can be used to change:
 1. The dataset's specific (`/dataset` subfolder).
 2. The neural network architecture (`/model` subfolder).
 3. The optimization process parameters (`/optimization` subfolder).
