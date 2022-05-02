@@ -11,25 +11,25 @@ We tested the above implementation on the same examples provided by the paper. A
 ## Issue with Pytorch functionals
 Since the library functorch is still in it's early development, the gradient computation with respect of some of the Pytorch's operations isn't supported yet. That's why some of these (the *softmax* activation and the *crossentropy* loss function) were redefined using standard tensor operations.  
 
-# Jvp
-The Jvp is the product of the Jacobian *J* of the model derived with respect of the parameter and a vector *v* called *perturbation vector* that, according to paper, is sampled from a Normal distribution with mean 0 and variance 1 at each forward pass.
+## Jvp
+The Jvp is the product of the Jacobian *J* of the model, derived with respect of the parameters, and a vector *v* called *perturbation vector* that, according to paper, is sampled from a Normal distribution with mean 0 and variance 1 at each forward pass.
 
 # Running the test
-For running the tests, simply clone the repo and, after moving to the repo root, use the command `python examples/<name_of_the_example.py>`.
+For running the tests, simply clone the repository and, after moving to the repo root, use the command `python <name_of_the_example.py>`.
 
 For comparison, also the same examples implemented with backpropagation is provided. To let the two implementations be as similar as possible, we used the rewritten Pytorch operations also for the backpropagation example (even if, in this case, Pytorch would support those operators).
 
 ## Running more examples
 All the configurations are managed using [Hydra](https://hydra.cc).
 
-Changing something in the classification example can be easily achieved by adding configuration file (under `/configs`) in the respective subfolder. These configurations can be used to change:
-1. The dataset on which the classification task will be performed (`/dataset` subfolder).
+Changing something in the MNIST example can be easily achieved by adding configuration files (found under `/configs`) in the respective subfolder. These configurations can be used to change:
+1. The dataset's specific (`/dataset` subfolder).
 2. The neural network architecture (`/model` subfolder).
 3. The optimization process parameters (`/optimization` subfolder).
 
 Follow Hydra's documentation to know more about how to manage configurations.
 
-## Perfomance comparison
+### Perfomance comparison
 Even if in the paper the forward implementation proved to be faster, in our case we didn't notice a speed up. Convergence is still achieved in all the examples with roughly the same amount of steps, but backpropagation's steps are faster then the *fwdgrad* ones. 
 
 We assume this is due to functorch being still in early development and not as optimized as Pytorch backpropagation yet.
