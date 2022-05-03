@@ -3,7 +3,9 @@
 This repo contains an unofficial implementation of the paper 
 [Gradients without backpropagation](https://arxiv.org/abs/2202.08587). 
 
-![Algrithm pseudocode](algorithm.png?raw=true "Algorithm pseudocode")
+<p align="center">
+  <img src="images/algorithm.png">
+</p>
 
 ## Repository description
 
