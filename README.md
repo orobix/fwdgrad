@@ -13,7 +13,7 @@ In this paper, a way to compute gradients by only using the forward pass is desc
 
 In our implementation, we used the brand new [functorch](https://pytorch.org/functorch/stable/functorch.html).
 Thanks to this library, the model can be treated as a function of its parameters. 
-With this change of perspective, the *jvp* of the model can be computed (for a brief explanation of what the Jvp of
+With this change of perspective, the *Jvp* of the model can be computed (for a brief explanation of what the Jvp of
 a function is, check below).
 
 We tested the above implementation on the same examples provided by the paper.
