@@ -20,19 +20,19 @@ For running the tests, simply clone the repository and, after moving to the repo
 For comparison, also the same examples implemented with backpropagation is provided. To let the two implementations be as similar as possible, we used the rewritten Pytorch operations also for the backpropagation example (even if, in this case, Pytorch would support those operators).
 
 ## Running more examples
-All the configurations are managed using [Hydra](https://hydra.cc). All configuration's file are stored in the `/configs` folder.
+All the configurations are managed using [Hydra](https://hydra.cc). Configuration files are stored in the `/configs` folder.
 
 For changing the global optimization example, modify the `global_optim_config.yaml` file.
 
 Changing something in the MNIST example can be easily achieved by adding configuration files in the respective subfolder and changing the `config.yaml` file. These configurations can be used to change:
-1. The dataset's specific (`/dataset` subfolder).
+1. The dataset's specific, like batch size or the shuffling parameter (`/dataset` subfolder).
 2. The neural network architecture (`/model` subfolder).
 3. The optimization process parameters (`/optimization` subfolder).
 
 Follow Hydra's documentation to know more about how to manage configurations.
 
 ### Perfomance comparison
-Even if in the paper the forward implementation proved to be faster, in our case we didn't notice a speed up. Convergence is still achieved in all the examples with roughly the same amount of steps, but backpropagation's steps are faster then the *fwdgrad* ones. 
+Even if in the paper the forward implementation proved to be faster, in our case we didn't notice a speed-up. Convergence is still achieved in all the examples with roughly the same amount of steps, but backpropagation's steps are faster than the *fwdgrad* ones. 
 
 We assume this is due to functorch being still in early development and not as optimized as Pytorch backpropagation yet.
 
