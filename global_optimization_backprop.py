@@ -6,6 +6,7 @@ import hydra
 
 @hydra.main(config_path="./configs/", config_name="global_optim_config.yaml")
 def main(cfg):
+    torch.manual_seed(cfg.seed)
     params = torch.rand(2)
     t_total = 0
     function = hydra.utils.instantiate(

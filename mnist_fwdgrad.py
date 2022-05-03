@@ -47,7 +47,7 @@ def train_model(cfg: DictConfig):
             for i, batch in enumerate(train_loader):
                 images, labels = batch
 
-                # Sample perturbation (tangent) vectors for every parameters of the model
+                # Sample perturbation (tangent) vectors for every parameter of the model
                 v_params = tuple([torch.randn_like(p) for p in params])
                 f = partial(
                     functional_xent,
@@ -58,8 +58,8 @@ def train_model(cfg: DictConfig):
 
                 # Forward AD
                 loss, jvp = fc.jvp(f, (params,), (v_params,))
-                
-                # Forward gradient + parmeter update
+
+                # Forward gradient + parmeter update (SGD)
                 params = tuple(
                     [
                         p.sub_(cfg.optimization.learning_rate * jvp * v_params[i])

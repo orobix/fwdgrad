@@ -1,5 +1,6 @@
 function:
   _target_: fwdgrad.global_optim_functions.baele
   _partial_: true
+seed: 42
 learning_rate: 1e-2
 iterations: 1000

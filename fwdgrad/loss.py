@@ -16,14 +16,16 @@ def _xent(x: torch.Tensor, t: torch.Tensor, num_classes: int = 10) -> torch.Tens
 
     Returns:
         torch.Tensor: Cross-entropy loss.
-    """    
+    """
     y = softmax(x)
     logy = -torch.log(y)
     loss = torch.mean(torch.sum(logy * F.one_hot(t, num_classes), dim=1))
     return loss
 
 
-def xent(model: torch.nn.Module, x: torch.Tensor, t: torch.Tensor, num_classes: int = 10) -> torch.Tensor:
+def xent(
+    model: torch.nn.Module, x: torch.Tensor, t: torch.Tensor, num_classes: int = 10
+) -> torch.Tensor:
     """Cross-entropy loss. Given a pytorch model, it computes the cross-entropy loss.
 
     Args:
@@ -34,7 +36,7 @@ def xent(model: torch.nn.Module, x: torch.Tensor, t: torch.Tensor, num_classes: 
 
     Returns:
         torch.Tensor: Cross-entropy loss.
-    """    
+    """
     y = model(x)
     return _xent(y, t, num_classes)
 
