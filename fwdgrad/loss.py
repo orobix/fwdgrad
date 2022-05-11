@@ -4,6 +4,7 @@ import torch
 from torch.nn import functional as F
 
 from fwdgrad.activation import softmax
+from fwdgrad.utils import clamp_probs
 
 
 def _xent(x: torch.Tensor, t: torch.Tensor, num_classes: int = 10) -> torch.Tensor:
@@ -17,7 +18,7 @@ def _xent(x: torch.Tensor, t: torch.Tensor, num_classes: int = 10) -> torch.Tens
     Returns:
         torch.Tensor: Cross-entropy loss.
     """
-    y = softmax(x)
+    y = clamp_probs(softmax(x))
     logy = -torch.log(y)
     loss = torch.mean(torch.sum(logy * F.one_hot(t, num_classes), dim=1))
     return loss
