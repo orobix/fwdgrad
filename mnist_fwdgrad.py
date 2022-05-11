@@ -1,3 +1,4 @@
+import math
 import time
 from functools import partial
 
@@ -15,26 +16,35 @@ from fwdgrad.loss import functional_xent
 def train_model(cfg: DictConfig):
     USE_CUDA = torch.cuda.is_available()
     DEVICE = torch.device(f"cuda:{cfg.device_id}" if USE_CUDA else "cpu")
-    mnist = torchvision.datasets.MNIST(
-        "/tmp/data",
-        train=True,
-        download=True,
-        transform=torchvision.transforms.Compose(
-            [
-                torchvision.transforms.ToTensor(),
-                torchvision.transforms.Lambda(lambda x: torch.flatten(x)),
-            ]
-        ),
-    )
+    if "NeuralNet" in cfg.model._target_:
+        mnist = torchvision.datasets.MNIST(
+            "/tmp/data",
+            train=True,
+            download=True,
+            transform=torchvision.transforms.Compose(
+                [
+                    torchvision.transforms.ToTensor(),
+                    torchvision.transforms.Lambda(lambda x: torch.flatten(x)),
+                ]
+            ),
+        )
+        input_size = mnist.data.shape[1] * mnist.data.shape[2]
+    else:
+        mnist = torchvision.datasets.MNIST(
+            "/tmp/data",
+            train=True,
+            download=True,
+            transform=torchvision.transforms.Compose([torchvision.transforms.ToTensor()]),
+        )
+        input_size = 1  # Channel size
+
     train_loader = hydra.utils.instantiate(cfg.dataset, dataset=mnist)
 
-    input_size = mnist.data.shape[1] * mnist.data.shape[2]
     output_size = len(mnist.classes)
     with torch.no_grad():
-        model = hydra.utils.instantiate(
-            cfg.model, input_size=input_size, output_size=output_size
-        )
+        model = hydra.utils.instantiate(cfg.model, input_size=input_size, output_size=output_size)
         model.to(DEVICE)
+        model.float()
         model.train()
 
         # Get the functional version of the model with functorch
@@ -60,17 +70,11 @@ def train_model(cfg: DictConfig):
                 loss, jvp = fc.jvp(f, (params,), (v_params,))
 
                 # Forward gradient + parmeter update (SGD)
-                params = tuple(
-                    [
-                        p.sub_(cfg.optimization.learning_rate * jvp * v_params[i])
-                        for i, p in enumerate(params)
-                    ]
-                )
+                lr = cfg.optimization.learning_rate * math.e ** (-(epoch * len(train_loader) + i) * cfg.optimization.k)
+                params = tuple([p.sub_(lr * jvp * v_params[j]) for j, p in enumerate(params)])
             t1 = time.perf_counter()
             t_total += t1 - t0
-            print(
-                f"Epoch [{epoch+1}/{cfg.optimization.epochs}], Loss: {loss.item():.4f}, Time (s): {t1 - t0:.4f}"
-            )
+            print(f"Epoch [{epoch+1}/{cfg.optimization.epochs}], Loss: {loss.item():.4f}, Time (s): {t1 - t0:.4f}")
         print(f"Mean time: {t_total / cfg.optimization.epochs:.4f}")
 
 

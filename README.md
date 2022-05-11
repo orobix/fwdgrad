@@ -45,7 +45,9 @@ For changing the global optimization example, modify the `global_optim_config.ya
 
 Changing something in the MNIST example can be easily achieved by adding configuration files in the respective subfolder and changing the `config.yaml` file. These configurations can be used to change:
 1. The dataset's specific, like batch size or the shuffling parameter (`/dataset` subfolder).
-2. The neural network architecture (`/model` subfolder).
+2. The neural network architecture (`/model` subfolder). Here two models are provided:
+   1. A Multilayer Perceptron inside the default configuration
+   2. A Convolutional NN inside `conv.yaml`
 3. The optimization process parameters (`/optimization` subfolder).
 
 Follow Hydra's documentation to know more about how to manage configurations.
@@ -54,9 +56,6 @@ Follow Hydra's documentation to know more about how to manage configurations.
 Even if in the paper the forward implementation proved to be faster, in our case we did not notice a speed-up. 
 Convergence is still achieved in all the examples with roughly the same amount of steps,
 but backpropagation's steps are faster than the *fwdgrad* ones. 
-
-We assume this is due to functorch being still in early development and not as optimized as Pytorch
-backpropagation yet.
 
 ## License
 This project is licensed under the MIT License
