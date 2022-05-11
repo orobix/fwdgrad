@@ -57,8 +57,7 @@ class ConvNet(nn.Module):
         self.fc2 = torch.nn.Linear(1024, output_size)
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
-        x = self.conv1(x)
-        x = F.relu(x)
+        x = F.relu(self.conv1(x))
         x = F.relu(self.conv2(x))
         x = F.max_pool2d(x, 2)
         x = F.relu(self.conv3(x))
