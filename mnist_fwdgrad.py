@@ -34,9 +34,7 @@ def train_model(cfg: DictConfig):
             "/tmp/data",
             train=True,
             download=True,
-            transform=torchvision.transforms.Compose(
-                [torchvision.transforms.ToTensor()]
-            ),
+            transform=torchvision.transforms.Compose([torchvision.transforms.ToTensor()]),
         )
         input_size = 1  # Channel size
 
@@ -44,9 +42,7 @@ def train_model(cfg: DictConfig):
 
     output_size = len(mnist.classes)
     with torch.no_grad():
-        model = hydra.utils.instantiate(
-            cfg.model, input_size=input_size, output_size=output_size
-        )
+        model = hydra.utils.instantiate(cfg.model, input_size=input_size, output_size=output_size)
         model.to(DEVICE)
         model.float()
         model.train()
@@ -74,18 +70,8 @@ def train_model(cfg: DictConfig):
                 loss, jvp = fc.jvp(f, (params,), (v_params,))
 
                 # Forward gradient + parmeter update (SGD)
-                params = tuple(
-                    [
-                        p.sub_(
-                            cfg.optimization.learning_rate
-                            * math.e
-                            ** (-(epoch * len(train_loader) + i) * cfg.optimization.k)
-                            * jvp
-                            * v_params[i]
-                        )
-                        for i, p in enumerate(params)
-                    ]
-                )
+                lr = cfg.optimization.learning_rate # * math.e ** (-(epoch * len(train_loader) + i) * cfg.optimization.k)
+                params = tuple([p.sub_(lr * jvp * v_params[i]) for i, p in enumerate(params)])
             t1 = time.perf_counter()
             t_total += t1 - t0
             print(
@@ -95,4 +81,5 @@ def train_model(cfg: DictConfig):
 
 
 if __name__ == "__main__":
-    train_model()
+    with torch.autograd.anomaly_mode.detect_anomaly():    
+        train_model()

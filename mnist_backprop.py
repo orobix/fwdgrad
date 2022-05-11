@@ -32,18 +32,14 @@ def train_model(cfg: DictConfig):
             "/tmp/data",
             train=True,
             download=True,
-            transform=torchvision.transforms.Compose(
-                [torchvision.transforms.ToTensor()]
-            ),
+            transform=torchvision.transforms.Compose([torchvision.transforms.ToTensor()]),
         )
         input_size = 1  # Channel size
 
     train_loader = hydra.utils.instantiate(cfg.dataset, dataset=mnist)
     output_size = len(mnist.classes)
 
-    model = hydra.utils.instantiate(
-        cfg.model, input_size=input_size, output_size=output_size
-    )
+    model = hydra.utils.instantiate(cfg.model, input_size=input_size, output_size=output_size)
     model.to(DEVICE)
     model.float()
     model.train()
@@ -56,12 +52,9 @@ def train_model(cfg: DictConfig):
             images, labels = batch
             loss = xent(model, images.to(DEVICE), labels.to(DEVICE))
             loss.backward()
+            lr = lr = cfg.optimization.learning_rate * math.e ** (-(epoch * len(train_loader) + i) * cfg.optimization.k)
             for p in params:
-                p.data.sub_(
-                    cfg.optimization.learning_rate
-                    * math.e ** (-(epoch * len(train_loader) + i) * cfg.optimization.k)
-                    * p.grad.data
-                )
+                p.data.sub_(lr * p.grad.data)
                 p.grad.data.zero_()
         t1 = time.perf_counter()
         t_total += t1 - t0

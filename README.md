@@ -57,9 +57,6 @@ Even if in the paper the forward implementation proved to be faster, in our case
 Convergence is still achieved in all the examples with roughly the same amount of steps,
 but backpropagation's steps are faster than the *fwdgrad* ones. 
 
-We assume this is due to functorch being still in early development and not as optimized as Pytorch
-backpropagation yet.
-
 ## License
 This project is licensed under the MIT License
 
