@@ -45,7 +45,9 @@ For changing the global optimization example, modify the `global_optim_config.ya
 
 Changing something in the MNIST example can be easily achieved by adding configuration files in the respective subfolder and changing the `config.yaml` file. These configurations can be used to change:
 1. The dataset's specific, like batch size or the shuffling parameter (`/dataset` subfolder).
-2. The neural network architecture (`/model` subfolder).
+2. The neural network architecture (`/model` subfolder). Here two models are provided:
+   1. A Multilayer Perceptron inside the default configuration
+   2. A Convolutional NN inside `conv.yaml`
 3. The optimization process parameters (`/optimization` subfolder).
 
 Follow Hydra's documentation to know more about how to manage configurations.

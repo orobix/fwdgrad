@@ -29,8 +29,14 @@ function, the recursive flag is set to `true`.
 
 * `activation_function`: the activation function for the layers of a NeuralNet object.
 Needs to be initialized.
-* hidden_sizes: a list of integers. For each entry of this list, a layer is created
+* `hidden_sizes`: a list of integers. For each entry of this list, a layer is created
 with the specified dimension.
+
+#### Convolutional
+Another configuration file is available with the name `conv.yaml`. It is needed for running the experiments
+using a convolutional neural network.
+
+It initializes a ConvNet.
 
 ### optimization
 Specify some parameters for the optimization.

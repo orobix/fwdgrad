@@ -34,14 +34,19 @@ def train_model(cfg: DictConfig):
             "/tmp/data",
             train=True,
             download=True,
-            transform=torchvision.transforms.Compose([torchvision.transforms.ToTensor()]),
+            transform=torchvision.transforms.Compose(
+                [torchvision.transforms.ToTensor()]
+            ),
         )
         input_size = 1  # Channel size
+
     train_loader = hydra.utils.instantiate(cfg.dataset, dataset=mnist)
 
     output_size = len(mnist.classes)
     with torch.no_grad():
-        model = hydra.utils.instantiate(cfg.model, input_size=input_size, output_size=output_size)
+        model = hydra.utils.instantiate(
+            cfg.model, input_size=input_size, output_size=output_size
+        )
         model.to(DEVICE)
         model.float()
         model.train()
@@ -73,7 +78,8 @@ def train_model(cfg: DictConfig):
                     [
                         p.sub_(
                             cfg.optimization.learning_rate
-                            * math.e ** (-(epoch * len(train_loader) + i) * cfg.optimization.k)
+                            * math.e
+                            ** (-(epoch * len(train_loader) + i) * cfg.optimization.k)
                             * jvp
                             * v_params[i]
                         )
@@ -82,7 +88,9 @@ def train_model(cfg: DictConfig):
                 )
             t1 = time.perf_counter()
             t_total += t1 - t0
-            print(f"Epoch [{epoch+1}/{cfg.optimization.epochs}], Loss: {loss.item():.4f}, Time (s): {t1 - t0:.4f}")
+            print(
+                f"Epoch [{epoch+1}/{cfg.optimization.epochs}], Loss: {loss.item():.4f}, Time (s): {t1 - t0:.4f}"
+            )
         print(f"Mean time: {t_total / cfg.optimization.epochs:.4f}")
 
 

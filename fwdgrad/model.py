@@ -67,8 +67,3 @@ class ConvNet(nn.Module):
         x = F.relu(self.fc1(x))
         x = self.fc2(x)
         return x
-
-
-if __name__ == "__main__":
-    m = ConvNet(1, 10)
-    print(m(torch.rand(32, 1, 28, 28)))
