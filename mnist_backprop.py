@@ -1,3 +1,4 @@
+import math
 import time
 
 import torch
@@ -13,24 +14,34 @@ from fwdgrad.loss import xent
 def train_model(cfg: DictConfig):
     USE_CUDA = torch.cuda.is_available()
     DEVICE = torch.device(f"cuda:{cfg.device_id}" if USE_CUDA else "cpu")
-    mnist = torchvision.datasets.MNIST(
-        "/tmp/data",
-        train=True,
-        download=True,
-        transform=torchvision.transforms.Compose(
-            [
-                torchvision.transforms.ToTensor(),
-                torchvision.transforms.Lambda(lambda x: torch.flatten(x)),
-            ]
-        ),
-    )
+    if "NeuralNet" in cfg.model._target_:
+        mnist = torchvision.datasets.MNIST(
+            "/tmp/data",
+            train=True,
+            download=True,
+            transform=torchvision.transforms.Compose(
+                [
+                    torchvision.transforms.ToTensor(),
+                    torchvision.transforms.Lambda(lambda x: torch.flatten(x)),
+                ]
+            ),
+        )
+        input_size = mnist.data.shape[1] * mnist.data.shape[2]
+    else:
+        mnist = torchvision.datasets.MNIST(
+            "/tmp/data",
+            train=True,
+            download=True,
+            transform=torchvision.transforms.Compose([torchvision.transforms.ToTensor()]),
+        )
+        input_size = 1  # Channel size
 
     train_loader = hydra.utils.instantiate(cfg.dataset, dataset=mnist)
-    input_size = mnist.data.shape[1] * mnist.data.shape[2]
     output_size = len(mnist.classes)
 
     model = hydra.utils.instantiate(cfg.model, input_size=input_size, output_size=output_size)
     model.to(DEVICE)
+    model.float()
     model.train()
     params = tuple(model.parameters())
 
@@ -42,7 +53,11 @@ def train_model(cfg: DictConfig):
             loss = xent(model, images.to(DEVICE), labels.to(DEVICE))
             loss.backward()
             for p in params:
-                p.data.sub_(cfg.optimization.learning_rate * p.grad.data)
+                p.data.sub_(
+                    cfg.optimization.learning_rate
+                    * math.e ** (-(epoch * len(train_loader) + i) * cfg.optimization.k)
+                    * p.grad.data
+                )
                 p.grad.data.zero_()
         t1 = time.perf_counter()
         t_total += t1 - t0

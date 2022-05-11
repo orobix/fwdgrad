@@ -1,3 +1,4 @@
+import math
 import time
 from functools import partial
 
@@ -35,13 +36,14 @@ def train_model(cfg: DictConfig):
             download=True,
             transform=torchvision.transforms.Compose([torchvision.transforms.ToTensor()]),
         )
-        input_size = 1
+        input_size = 1  # Channel size
     train_loader = hydra.utils.instantiate(cfg.dataset, dataset=mnist)
 
     output_size = len(mnist.classes)
     with torch.no_grad():
         model = hydra.utils.instantiate(cfg.model, input_size=input_size, output_size=output_size)
         model.to(DEVICE)
+        model.float()
         model.train()
 
         # Get the functional version of the model with functorch
@@ -68,7 +70,15 @@ def train_model(cfg: DictConfig):
 
                 # Forward gradient + parmeter update (SGD)
                 params = tuple(
-                    [p.sub_(cfg.optimization.learning_rate * jvp * v_params[i]) for i, p in enumerate(params)]
+                    [
+                        p.sub_(
+                            cfg.optimization.learning_rate
+                            * math.e ** (-(epoch * len(train_loader) + i) * cfg.optimization.k)
+                            * jvp
+                            * v_params[i]
+                        )
+                        for i, p in enumerate(params)
+                    ]
                 )
             t1 = time.perf_counter()
             t_total += t1 - t0
