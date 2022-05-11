@@ -70,7 +70,7 @@ def train_model(cfg: DictConfig):
                 loss, jvp = fc.jvp(f, (params,), (v_params,))
 
                 # Forward gradient + parmeter update (SGD)
-                lr = cfg.optimization.learning_rate # * math.e ** (-(epoch * len(train_loader) + i) * cfg.optimization.k)
+                lr = cfg.optimization.learning_rate * math.e ** (-(epoch * len(train_loader) + i) * cfg.optimization.k)
                 params = tuple([p.sub_(lr * jvp * v_params[i]) for i, p in enumerate(params)])
             t1 = time.perf_counter()
             t_total += t1 - t0
