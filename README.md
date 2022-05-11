@@ -61,4 +61,4 @@ backpropagation yet.
 ## License
 This project is licensed under the MIT License
 
-Copyright (c) 2018 Federico Belotti and Davide Angioni, Orobix Srl (www.orobix.com).
+Copyright (c) 2018 Federico Belotti, Davide Angioni, Orobix Srl (www.orobix.com).
