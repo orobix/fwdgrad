@@ -60,4 +60,4 @@ but backpropagation's steps are faster than the *fwdgrad* ones.
 ## License
 This project is licensed under the MIT License
 
-Copyright (c) 2018 Federico Belotti, Davide Angioni, Orobix Srl (www.orobix.com).
+Copyright (c) 2022 Federico Belotti, Davide Angioni, Orobix Srl (www.orobix.com).
