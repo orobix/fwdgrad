@@ -49,7 +49,6 @@ def train_model(cfg: DictConfig):
 
         # Get the functional version of the model with functorch
         fmodel, params = fc.make_functional(model)
-        params = tuple(params)
 
         t_total = 0
         for epoch in range(cfg.optimization.epochs):
@@ -67,11 +66,12 @@ def train_model(cfg: DictConfig):
                 )
 
                 # Forward AD
-                loss, jvp = fc.jvp(f, (params,), (v_params,))
+                loss, jvp = fc.jvp(f, (tuple(params),), (v_params,))
 
                 # Forward gradient + parmeter update (SGD)
                 lr = cfg.optimization.learning_rate * math.e ** (-(epoch * len(train_loader) + i) * cfg.optimization.k)
-                params = tuple([p.sub_(lr * jvp * v_params[j]) for j, p in enumerate(params)])
+                for j, p in enumerate(params):
+                    p.sub_(lr * jvp * v_params[j])
             t1 = time.perf_counter()
             t_total += t1 - t0
             print(f"Epoch [{epoch+1}/{cfg.optimization.epochs}], Loss: {loss.item():.4f}, Time (s): {t1 - t0:.4f}")

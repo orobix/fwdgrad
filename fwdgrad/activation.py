@@ -1,7 +1,7 @@
 import torch
 
 
-def softmax(x: torch.Tensor, dim: int = 1) -> torch.Tensor:
+def softmax(x: torch.Tensor, dim: int = -1) -> torch.Tensor:
     """Numerically stable softmax function.
 
     Args:
