@@ -1,7 +1,7 @@
-import functorch as fc
-import torch
 import time
+
 import hydra
+import torch
 
 
 @hydra.main(config_path="./configs/", config_name="global_optim_config.yaml")

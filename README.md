@@ -13,17 +13,12 @@ In this paper, a way to compute gradients by only using the forward pass is desc
 1. The global optimization of two famous funtions: Beale and Rosenbrok functions.
 2. The well known classification task on the MNIST dataset.
 
-In our implementation, we used the brand new [functorch](https://pytorch.org/functorch/stable/functorch.html).
+In our implementation, we used the brand new [functorch](https://pytorch.org/functorch/stable/index.html).
 Thanks to this library, the model can be treated as a function of its parameters. 
 With this change of perspective, the *Jvp* of the model can be computed (for a brief explanation of what the Jvp of
 a function is, check below).
 
 We tested the above implementation on the same examples provided by the paper.
-
-### Issue with Pytorch functionals
-Since the library functorch is still in its early development, the gradient computation with respect of some of 
-Pytorch's operations is not supported yet. For this reason, some of these (like the *softmax* activation and 
-the *crossentropy* loss function) were redefined using standard tensor operations.  
 
 ### Jvp
 The Jvp is the product of the Jacobian *J* of the model, derived with respect of the parameters,
@@ -32,7 +27,9 @@ independent from each other and sampled from a Normal distribution with mean 0 a
 
 ## Running the optimization
 For running the optimization, simply clone the repository and, after moving to the repo root, 
-use the command `python <name_of_the_example.py>`
+use the command `python <name_of_the_example.py>`.  
+
+For both the MNIST examples you can visualize the training progress with tensorboard: `tensorboard --logdir outputs`
 
 All the examples are implemented both with the new *forward gradient* method and with backpropagation.
 To let the two implementations be as similar as possible, we used the rewritten Pytorch operations also 
@@ -52,12 +49,36 @@ Changing something in the MNIST example can be easily achieved by adding configu
 
 Follow Hydra's documentation to know more about how to manage configurations.
 
-#### Perfomance comparison
+### Perfomance comparison
 Even if in the paper the forward implementation proved to be faster, in our case we did not notice a speed-up. 
 Convergence is still achieved in all the examples with roughly the same amount of steps,
-but backpropagation's steps are faster than the *fwdgrad* ones. 
+but backpropagation's steps are faster than the *fwdgrad* ones.   
 
-## License
+The next graph shows the loss on the train dataset obtained with the following  
+
+```bash
+python mnist_<optimization_type>.py dataset.batch_size=1024 optimization.learning_rate=5e-4
+```
+
+where `<optimization_type>` is one of `fwdgrad` or `backprop`
+
+<p align="center">
+  <img src="./images/Loss_train_loss.svg" width="73%" />
+</p>
+
+The accuracies on the test set are:
+
+|                                               | Test accuracy |
+| --------------------------------------------- | ------------- |
+| <span style="color:Blue">Backprop</span>      | 0.8839        |
+| <span style="color:DarkOrange">Fwdgrad</span> | 0.9091        |
+
+
+# Changelog
+
+* 15/04/2023: update functorch using directly torch-2.0.0
+
+# License
 This project is licensed under the MIT License
 
 Copyright (c) 2022 Federico Belotti, Davide Angioni, Orobix Srl (www.orobix.com).

@@ -3,3 +3,4 @@ batch_size: 64
 shuffle: true
 num_workers: 8
 pin_memory: true
+drop_last: false

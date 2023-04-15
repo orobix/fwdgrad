@@ -1,3 +1,3 @@
-epochs: 500
+epochs: 200
 learning_rate: 2e-4
 k: 1e-4
