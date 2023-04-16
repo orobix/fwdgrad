@@ -70,8 +70,8 @@ The accuracies on the test set are:
 
 |                                               | Test accuracy |
 | --------------------------------------------- | ------------- |
-| <span style="color:Blue">Backprop</span>      | 0.8839        |
-| <span style="color:DarkOrange">Fwdgrad</span> | 0.9091        |
+| $${\color{Cyan}\textrm{Backprop}}$$      | 0.8839        |
+| $${\color{darkorange}\textrm{Fwdgrad}}$$      | 0.9091        |
 
 
 # Changelog
