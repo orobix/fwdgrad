@@ -31,7 +31,7 @@ def train_model(cfg: DictConfig):
     input_size = 1  # Channel size
     transform = [torchvision.transforms.ToTensor(), torchvision.transforms.Normalize((0.1307,), (0.3081,))]
     if "NeuralNet" in cfg.model._target_:
-        transform.append(torchvision.transforms.Lambda(lambda x: torch.flatten(x)))
+        transform.append(torchvision.transforms.Lambda(torch.flatten))
         mnist_train = torchvision.datasets.MNIST(
             "/tmp/data",
             train=True,
