@@ -18,7 +18,7 @@ def train_model(cfg: DictConfig):
     use_cuda = torch.cuda.is_available()
     device = torch.device(f"cuda:{cfg.device_id}" if use_cuda else "cpu")
     total_epochs = cfg.epochs
-    grad_clipping = 0.0
+    grad_clipping = cfg.grad_clipping
 
     # Summary
     writer = tensorboard.writer.SummaryWriter(os.path.join(os.getcwd(), "logs/backprop"))
