@@ -9,19 +9,20 @@ import torch
 import torch.func as fc
 import torch.nn.functional as F
 import torchvision
-from omegaconf import DictConfig
+from omegaconf import DictConfig, OmegaConf
 from torch.utils import tensorboard
 
 from fwdgrad.loss import functional_xent
+
+OmegaConf.register_new_resolver("get_method", hydra.utils.get_method)
 
 
 @hydra.main(config_path="./configs/", config_name="config.yaml")
 def train_model(cfg: DictConfig):
     use_cuda = torch.cuda.is_available()
     device = torch.device(f"cuda:{cfg.device_id}" if use_cuda else "cpu")
-    total_epochs = cfg.optimization.epochs
-    init_lr = cfg.optimization.learning_rate
-    k = cfg.optimization.k
+    total_epochs = cfg.epochs
+    grad_clipping = cfg.grad_clipping
 
     # Summary
     writer = tensorboard.writer.SummaryWriter(os.path.join(os.getcwd(), "logs/fwdgrad"))
@@ -67,6 +68,11 @@ def train_model(cfg: DictConfig):
         model.float()
         model.train()
 
+        optimizer: torch.optim.Optimizer = hydra.utils.instantiate(cfg.optimizer, params=model.parameters())
+        optimizer.zero_grad(set_to_none=True)
+
+        scheduler: torch.optim.lr_scheduler._LRScheduler = hydra.utils.instantiate(cfg.scheduler, optimizer=optimizer)
+
         named_buffers = dict(model.named_buffers())
         named_params = dict(model.named_parameters())
         names = named_params.keys()
@@ -98,13 +104,27 @@ def train_model(cfg: DictConfig):
                 # Forward AD
                 loss, jvp = fc.jvp(f, (tuple(params),), (v_params,))
 
-                # Forward gradient + parmeter update (SGD)
-                lr = init_lr * math.e ** (-steps * k)
-                for p, v in zip(params, v_params):
-                    p.sub_(lr * jvp * v)
+                # Setting gradients
+                for v, p in zip(v_params, params):
+                    p.grad = v * jvp
+
+                # Clip gradients
+                if grad_clipping > 0:
+                    torch.nn.utils.clip_grad.clip_grad_norm_(
+                        parameters=params, max_norm=grad_clipping, error_if_nonfinite=True
+                    )
+
+                # Optimizer step
+                optimizer.step()
+
+                # Lr scaling
+                scheduler.step()
+
+                # Zero out grads
+                optimizer.zero_grad(set_to_none=True)
 
                 writer.add_scalar("Loss/train_loss", loss, steps)
-                writer.add_scalar("Misc/lr", lr, steps)
+                writer.add_scalar("Misc/lr", scheduler.get_last_lr()[0], steps)
 
             t1 = time.perf_counter()
             t_total += t1 - t0

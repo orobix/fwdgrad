@@ -1,0 +1,6 @@
+_target_: torch.optim.lr_scheduler.LambdaLR
+lr_lambda:
+  _target_: functools.partial
+  _args_:
+    - ${get_method:fwdgrad.utils.exponential_lr_decay}
+  k: 1e-4

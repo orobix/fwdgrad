@@ -2,6 +2,9 @@ defaults:
   - _self_
   - dataset: default
   - model: default
-  - optimization: default
+  - optimizer: default
+  - scheduler: default
 
+epochs: 200
 device_id: 0
+grad_clipping: 0.0
